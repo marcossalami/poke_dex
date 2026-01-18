@@ -278,5 +278,49 @@ void main() {
         expect(loadingStates[1], false); // Termina carregando
       });
     });
+
+    group('reset', () {
+      test('deve limpar a lista de pokémons e resetar estados', () async {
+        // Arrange
+        final pokemons = [
+          const PokemonEntity(
+            id: 1,
+            name: 'bulbasaur',
+            imageUrl: 'url',
+            types: ['grass'],
+            height: 7,
+            weight: 69,
+            stats: [],
+          ),
+        ];
+
+        when(
+          () => mockGetPokemons(limit: 20, offset: 0),
+        ).thenAnswer((_) async => pokemons);
+
+        await provider.fetchPokemons();
+        expect(provider.pokemons, isNotEmpty);
+
+        // Act
+        provider.reset();
+
+        // Assert
+        expect(provider.pokemons, isEmpty);
+        expect(provider.hasError, false);
+        expect(provider.isLoading, false);
+      });
+
+      test('deve notificar listeners ao resetar', () {
+        // Arrange
+        final notifyCount = <int>[];
+        provider.addListener(() => notifyCount.add(1));
+
+        // Act
+        provider.reset();
+
+        // Assert
+        expect(notifyCount.isNotEmpty, true);
+      });
+    });
   });
 }

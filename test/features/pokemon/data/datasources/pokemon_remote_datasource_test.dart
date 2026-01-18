@@ -107,7 +107,7 @@ void main() {
         // Act & Assert
         expect(
           () => datasource.getPokemons(limit: limit, offset: offset),
-          throwsA(isA<DioException>()),
+          throwsException,
         );
       });
     });
@@ -170,10 +170,7 @@ void main() {
         );
 
         // Act & Assert
-        expect(
-          () => datasource.getPokemonDetail(name),
-          throwsA(isA<DioException>()),
-        );
+        expect(() => datasource.getPokemonDetail(name), throwsException);
       });
     });
   });

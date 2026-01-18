@@ -61,4 +61,13 @@ class PokemonProvider extends ChangeNotifier {
       return null;
     }
   }
+
+  void reset() {
+    _pokemons.clear();
+    _offset = 0;
+    _hasReachedEnd = false;
+    hasError = false;
+    isLoading = false;
+    notifyListeners();
+  }
 }
