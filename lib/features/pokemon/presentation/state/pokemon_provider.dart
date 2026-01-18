@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:poke_dex/features/pokemon/domain/usecases/get_pokemon_detail.dart';
 import '../../domain/entities/pokemon_entity.dart';
 import '../../domain/usecases/get_pokemons.dart';
 
 class PokemonProvider extends ChangeNotifier {
   final GetPokemons getPokemons;
+  final GetPokemonDetail getPokemonDetail;
 
-  PokemonProvider(this.getPokemons);
+  PokemonProvider(this.getPokemons, this.getPokemonDetail);
 
   final List<PokemonEntity> _pokemons = [];
+
+  final Map<String, PokemonEntity> _detailsCache = {};
+
   List<PokemonEntity> get pokemons => _pokemons;
 
   bool isLoading = false;
@@ -39,5 +44,21 @@ class PokemonProvider extends ChangeNotifier {
 
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<PokemonEntity?> fetchPokemonDetail(String name) async {
+    if (_detailsCache.containsKey(name)) {
+      return _detailsCache[name];
+    }
+
+    try {
+      final pokemon = await getPokemonDetail(
+        GetPokemonDetailParams(name: name),
+      );
+      _detailsCache[name] = pokemon;
+      return pokemon;
+    } catch (_) {
+      return null;
+    }
   }
 }

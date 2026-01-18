@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poke_dex/features/pokemon/presentation/pages/pokemon_detail_page.dart';
 import '../../domain/entities/pokemon_entity.dart';
 
 class PokemonCard extends StatelessWidget {
@@ -18,6 +19,14 @@ class PokemonCard extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         title: Text(pokemon.name.toUpperCase()),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PokemonDetailPage(pokemonName: pokemon.name),
+            ),
+          );
+        },
       ),
     );
   }
