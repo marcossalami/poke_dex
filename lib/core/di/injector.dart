@@ -25,7 +25,7 @@ void init() {
   sl.registerLazySingleton(() => GetPokemons(sl()));
   sl.registerLazySingleton(() => GetPokemonDetail(sl()));
 
-  sl.registerFactory(() => PokemonProvider(sl()));
+  sl.registerFactory(() => PokemonProvider(sl(), sl()));
 
   sl.registerFactory(() => PokemonProvider(sl(), sl()));
 }
