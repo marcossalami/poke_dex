@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:poke_dex/core/enums/pokemon_type.dart';
+import 'package:poke_dex/core/enums/pokemon_type_extension.dart';
+import 'package:poke_dex/core/enums/pokemon_type_parser.dart';
+import 'package:poke_dex/features/pokemon/presentation/widgets/info_column.dart';
 import 'package:provider/provider.dart';
 import '../../domain/entities/pokemon_entity.dart';
 import '../state/pokemon_provider.dart';
@@ -11,7 +15,6 @@ class PokemonDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(pokemonName.toUpperCase())),
       body: FutureBuilder<PokemonEntity?>(
         future: context.read<PokemonProvider>().fetchPokemonDetail(pokemonName),
         builder: (context, snapshot) {
@@ -25,28 +28,137 @@ class PokemonDetailPage extends StatelessWidget {
             return const Center(child: Text('Erro ao carregar Pokémon'));
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.network(pokemon.imageUrl, height: 200),
-                const SizedBox(height: 16),
-                Text(
-                  pokemon.name.toUpperCase(),
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 8),
-                Text('Altura: ${pokemon.height}'),
-                Text('Peso: ${pokemon.weight}'),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: pokemon.types
-                      .map((type) => Chip(label: Text(type)))
-                      .toList(),
-                ),
-              ],
+          final primaryType = pokemon.types.isNotEmpty
+              ? pokemonTypeFromString(pokemon.types.first)
+              : PokemonType.normal;
+
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  primaryType.color,
+                  primaryType.color.withValues(alpha: 0.75),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  /// HEADER
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const Spacer(),
+                        Text(
+                          pokemon.name.toUpperCase(),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.3,
+                              ),
+                        ),
+                        const Spacer(flex: 2),
+                      ],
+                    ),
+                  ),
+
+                  /// IMAGE
+                  Hero(
+                    tag: pokemon.name,
+                    child: Image.network(
+                      pokemon.imageUrl,
+                      height: 240,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  /// CONTENT CARD
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(32),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          /// TYPES
+                          Wrap(
+                            spacing: 10,
+                            children: pokemon.types.map((type) {
+                              final enumType = pokemonTypeFromString(type);
+
+                              return Chip(
+                                avatar: Icon(
+                                  enumType.icon,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                label: Text(
+                                  enumType.labelPtBr,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                backgroundColor: enumType.color.withValues(
+                                  alpha: 0.9,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+
+                          const SizedBox(height: 28),
+
+                          /// STATS
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              InfoColumn(
+                                label: 'ALTURA',
+                                value: '${pokemon.height / 10} m',
+                              ),
+                              InfoColumn(
+                                label: 'PESO',
+                                value: '${pokemon.weight / 10} kg',
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          /// DESCRIPTION
+                          Text(
+                            'Um Pokémon do tipo ${pokemon.types.map((e) => pokemonTypeFromString(e).labelPtBr).join(' / ')}.\n',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Colors.grey[700],
+                                  height: 1.5,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
