@@ -30,7 +30,6 @@ class PokemonCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                /// IMAGE
                 Expanded(
                   child: Hero(
                     tag: pokemon.name,
@@ -57,7 +56,6 @@ class PokemonCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                /// NAME
                 Text(
                   pokemon.name.toUpperCase(),
                   textAlign: TextAlign.center,
@@ -70,7 +68,6 @@ class PokemonCard extends StatelessWidget {
 
                 const SizedBox(height: 8),
 
-                /// TYPES
                 Wrap(
                   spacing: 6,
                   runSpacing: 4,

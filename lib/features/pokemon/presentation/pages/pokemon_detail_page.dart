@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:poke_dex/core/enums/pokemon_type.dart';
 import 'package:poke_dex/core/enums/pokemon_type_extension.dart';
 import 'package:poke_dex/core/enums/pokemon_type_parser.dart';
+import 'package:poke_dex/features/pokemon/presentation/pages/pokemon_detail_skeleton.dart';
 import 'package:poke_dex/features/pokemon/presentation/widgets/info_column.dart';
+import 'package:poke_dex/features/pokemon/presentation/widgets/pokemon_stat_bar.dart';
 import 'package:provider/provider.dart';
 import '../../domain/entities/pokemon_entity.dart';
 import '../state/pokemon_provider.dart';
@@ -19,7 +21,7 @@ class PokemonDetailPage extends StatelessWidget {
         future: context.read<PokemonProvider>().fetchPokemonDetail(pokemonName),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const PokemonDetailSkeleton();
           }
 
           final pokemon = snapshot.data;
@@ -46,7 +48,6 @@ class PokemonDetailPage extends StatelessWidget {
             child: SafeArea(
               child: Column(
                 children: [
-                  /// HEADER
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
@@ -73,7 +74,6 @@ class PokemonDetailPage extends StatelessWidget {
                     ),
                   ),
 
-                  /// IMAGE
                   Hero(
                     tag: pokemon.name,
                     child: Image.network(
@@ -85,7 +85,6 @@ class PokemonDetailPage extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  /// CONTENT CARD
                   Expanded(
                     child: Container(
                       width: double.infinity,
@@ -98,7 +97,6 @@ class PokemonDetailPage extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          /// TYPES
                           Wrap(
                             spacing: 10,
                             children: pokemon.types.map((type) {
@@ -126,7 +124,6 @@ class PokemonDetailPage extends StatelessWidget {
 
                           const SizedBox(height: 28),
 
-                          /// STATS
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -140,19 +137,18 @@ class PokemonDetailPage extends StatelessWidget {
                               ),
                             ],
                           ),
+                          const SizedBox(height: 28),
+
+                          Column(
+                            children: pokemon.stats.map((stat) {
+                              return PokemonStatBar(
+                                stat: stat,
+                                color: primaryType.color,
+                              );
+                            }).toList(),
+                          ),
 
                           const SizedBox(height: 32),
-
-                          /// DESCRIPTION
-                          Text(
-                            'Um Pokémon do tipo ${pokemon.types.map((e) => pokemonTypeFromString(e).labelPtBr).join(' / ')}.\n',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: Colors.grey[700],
-                                  height: 1.5,
-                                ),
-                          ),
                         ],
                       ),
                     ),
